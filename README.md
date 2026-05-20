@@ -14,7 +14,7 @@ Juan Rodríguez (Rol:Programador del robot, Github : " ")
 
 ### Objetivo del Laboratorio 2 :
 
-Implementar un sistema b´asico de navegación reactiva en Webots para un
+Implementar un sistema básico de navegación reactiva en Webots para un
 robot móvil diferencial, utilizando sensores de distancia y encoders de rueda,
 aplicando filtrado sobre las mediciones y empleando un filtro de Kalman para
 estimar la distancia frontal a obstáculos y mejorar la toma de decisiones.
@@ -29,11 +29,11 @@ Nuestro robot será un robot móvil diferencial con una locomoción por ruedas e
 
 ### 1. Sensores de distancia y proximidad :
 
-**(a) sensores infrarrojos (IR Distance Sensors, DistanceSensors en Webots)  :**
+**(a) sensores infrarrojos (IR DistanceSensors, DistanceSensors en Webots)  :**
 
 Para  los sensores frontales de distancia, y los sensores laterales.
 
-**(b) sensores de ultrasonido (Sonar o Ultrasonic sensors) :**
+**(b) sensores de ultrasonido (Sonar o UltrasonicSensors) :**
 
 Para usarlos configurar DistanceSensors configurados como tipo "sonar", Por qué? Porque dan mayor rango de apertura y de distancia que los infrarrojos
 
@@ -68,9 +68,9 @@ El experimento duró 20 segundos, entonces la cantidad de muestras registradas e
 
 Aquí se deben analizar las señales registradas en la frecuencia de muestreo fija :
 
-Consistencia (Desviación estándar matemática) : mide si cada señal registrada coincide en el tiempo teórico establecido, por ejemplo, si el tiempo de muestreo Ts es 10 ms, qué tan cerca están las señales de ese valor, y si presentan algún sesgo (error sistemático) o un error aleatorio, y en base a eso qué filtrado simple podríamos aplicar , ejemplo : filtrado del promedio, calibración.
+**Consistencia (Desviación estándar matemática) :** mide si cada señal registrada coincide en el tiempo teórico establecido, por ejemplo, si el tiempo de muestreo Ts es 10 ms, qué tan cerca están las señales de ese valor, y si presentan algún sesgo (error sistemático) o un error aleatorio, y en base a eso qué filtrado simple podríamos aplicar , ejemplo : filtrado del promedio, calibración.
 
-Valores atípicos en señales registradas : Señales que se desvién excesivamente del tiempo de muestreo.
+**Valores atípicos en señales registradas :** Señales que se desvién excesivamente del tiempo de muestreo.
 
 
 ## Estimación del avance mediante encoders:
@@ -88,6 +88,22 @@ Y ahora debemos establecer las fuentes de información, es decir, en qué basarn
 ## Filtro simple aplicado:
 
 ## Implementación del filtro de Kalman:
+
+Para implementar el filtro de Kalman, hay que definir 6 parámetros iniciales clave :
+
+**x1_pred :** predicción de la posición x.
+
+**Incertidumbre inicial(P0) :** nuestra seguridad sobre la posición inicial, generalmente 1.
+
+**Variable de control (u) :** distancia frontal al obstáculo más cercano.
+
+**Ruido del proceso (Q) :** Las pequeñas perturbaciones del entorno, generalmente oscila el valor 0.1 si es estable.
+
+**Ruido de la medición (R) :** Este es el error propio del sensor, los rangos comunes son entre 0.25 (poco errado) a 1 (considerablemente errado)
+
+El filtro de Kalman funciona por iteraciones (t) , y en cada iteración, el filtro de Kalman se acerca más al valor verdadero.
+
+<img width="623" height="396" alt="image" src="https://github.com/user-attachments/assets/cb0c7510-d4d5-4985-ba79-4563eb599c17" />
 
 ## Descripción de las etapas de predicción y corrección: 
 
