@@ -50,19 +50,19 @@ Encoder de la rueda derecha : Un sensor PositionSensor asociado a motor derecho 
 
 La frecuencia de muestro permite  registrar la lectura de los sensores y encoders, se usará una frecuencia de muestreo fija, para usar esta frecuencia de muestreo debemos definir:
 
-**tiempo de muestreo (Ts) :** También conocido como periodo, es el intervalo que transcurre entre dos lecturas del sensor se mide generalmente en segundos (s) o milisegundos (ms).
+**tiempo de muestreo ($T_s$) :** También conocido como periodo, es el intervalo que transcurre entre dos lecturas del sensor se mide generalmente en segundos (s) o milisegundos (ms).
 
-**frecuencia de muestreo :** La cantidad de lectura que realiza el sensor por cada segundo, es inverso al tiempo de muestro fs= 1/Ts.
+**frecuencia de muestreo ($f_s$) :** La cantidad de lectura que realiza el sensor por cada segundo, es inverso al tiempo de muestro $f_s$= 1/$T_s$.
 
 **cantidad de muestras regstradas por cada experimento** : es la cantidad total de ejecucipones o iteraciones que se aplica la frecuencia de muestreo en cada experimento.
 
 Ejemplo :
 
-Ts = 4.16 ms.
+$T_s$ = 4.16 ms.
 
-fs = 1000ms(1s) / Ts = 1000 / 4.16 = 240 Hz
+$f_s$ = 1000ms(1s) / $T_s$ = 1000 / 4.16 = 240 Hz
 
-El experimento duró 20 segundos, entonces la cantidad de muestras registradas en el experimento fueron 20 * fs = 4800 ejecuciones.
+El experimento duró 20 segundos, entonces la cantidad de muestras registradas en el experimento fueron 20 * $f_s$ = 4800 ejecuciones.
 
 ## Análisis de las señales registradas:
 
@@ -81,9 +81,9 @@ Primero debemos establecer la variable a estimar.
 
 Y ahora debemos establecer las fuentes de información, es decir, en qué basarnos para estimar la variable principal :
 
-**Predicción :** Estima los valores antes de ser registrados, se obtendra a partir de los encoders de las ruedas, estimando cuanto avanzo el robot entre dos instantes consecutivos.
+**Predicción :** Estima los valores antes de ser registrados, se obtendrá a partir de los encoders de las ruedas, estimando cuanto avanzo el robot entre dos instantes consecutivos.
 
-**Corrección :** Rectifica los valores registrados que estén alejados del valor real, se realizara con las lecturas de los sensores frontales de distancia, los cuales entregan una medicion directa, pero ruidosa, de la cercana de obstaculos.
+**Corrección :** Rectifica los valores registrados que estén alejados del valor real, se realizará con las lecturas de los sensores frontales de distancia, los cuales entregan una medicion directa, pero ruidosa, de la cercana de obstaculos.
 
 
 ## Filtro simple aplicado:
@@ -172,6 +172,41 @@ hasta (t=k)
 Para el caso de estudio, se debe aplicar el filtro de Kalman en k iteraciones como en el ejemplo, solo hay algo importante, en nuestro caso de estudio la variable de control es la distancia frontal al obstáculo más cercano, por tanto su notación no es $\hat{x}_k$ sino $\hat{d}_k$
 
 ## Descripción de las etapas de predicción y corrección: 
+
+### 1) La predicción de resultados
+
+**Primero , recordemos qué debíamos hacer en la predicción :**
+
+**Predicción :** Estima los valores antes de ser registrados, se obtendrá a partir de los encoders de las ruedas, estimando cuanto avanzo el robot entre dos instantes consecutivos.
+
+**Ahora debemos aplicar la predicción :**
+
+La fase de predicción nos plantea cuál debería ser nuestra nueva distancia hasta el obstáculo antes de leer los sensores. Se fundamenta principalmente en la odometría diferencial (odometría ; estudio y medición de las variables internas del robot) : los sensores de posición angular (PositionSensor) miden cuántos radianes giró cada una de las ruedas en el último periodo de tiempo de muestreo $T_s$.A partir del radio de la rueda ($R_{rueda}$).
+
+**Calculamos el avance lineal de cada rueda:**
+
+$$\Delta s_{izq} = R_{rueda} \cdot (\theta_{izq, k} - \theta_{izq, k-1})$$
+
+$$\Delta s_{der} = R_{rueda} \cdot (\theta_{der, k} - \theta_{der, k-1})$$
+
+El desplazamiento neto del centro del robot es el promedio de ambos avances: $\Delta s = \frac{\Delta s_{izq} + \Delta s_{der}}{2}$. Como el robot avanza hacia el obstáculo frontal, la distancia estimada disminuye en esa misma proporción. Recordando la aplicación del Filtro de Kalman,  las ecuaciones de predicción para el Filtro de Kalman son:
+
+**Predicción del Estado (Distancia):**
+
+$$\hat{d}_{k|k-1} = \hat{d}_{k-1|k-1} - \Delta s$$
+
+**Predicción de la Incertidumbre:**
+
+$$P_{k|k-1} = P_{k-1|k-1} + Q$$
+
+### 2) La corrección de resultados
+
+**Primero , recordemos qué debíamos hacer en la corrección :**
+
+**Corrección :** Rectifica los valores registrados que estén alejados del valor real, se realizará con las lecturas de los sensores frontales de distancia, los cuales entregan una medicion directa, pero ruidosa, de la cercana de obstaculos.
+
+**Ahora debemos aplicar la predicción :**
+
 
 ## Lógica de navegación reactiva implementada:
 
