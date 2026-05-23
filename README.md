@@ -260,15 +260,15 @@ El algoritmo de navegación reactiva que diseñamos se basa principalmente en es
                                                │
                                                ▼
                          ┌───────────────────────────────────────────┐
-                         │   ¿Distancia al obstáculo frontal $d̂_k$?  │
+                         │    ¿Distancia al obstáculo frontal d̂_k?   │
                          └─────────────────────┬─────────────────────┘
                                                │
                  ┌─────────────────────────────┼─────────────────────────────┐
                  │ (< 0.4m)                    │ (0.4m a 0.8m)               │ (> 0.8m)
                  ▼                             ▼                             ▼
    ┌───────────────────────────┐ ┌───────────────────────────┐ ┌───────────────────────────┐
-   │    GIRO DE EMERGENCIA     │ │    EVITACIÓN GRADUAL      │ │     CRUCERO MÁXIMO        │
-   │ (Giro sobre su propio eje)│ │    (Frenado y giro)       │ │   (Avance lineal libre)   │
+   │     GIRO DE EMERGENCIA    │ │     EVITACIÓN GRADUAL     │ │      CRUCERO MÁXIMO       │
+   │ (Giro sobre su propio eje)│ │     (Frenado y giro)      │ │   (Avance lineal libre)   │
    └───────────────────────────┘ └───────────────────────────┘ └───────────────────────────┘
 
 ```
