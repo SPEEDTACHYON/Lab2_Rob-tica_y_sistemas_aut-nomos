@@ -8,7 +8,7 @@ En el presente repositorio del laboratorio 2 se encuentra el readme con el segui
 
 Joaquín Rojas (Rol:Documentador,Github : "SPEEDTACHYON")
 
-Juan Rodríguez (Rol:Programador del robot, Github : "Ing-loop")
+Juan Rodríguez (Rol:Programador del robot y creador de entornos utilizados, Github : "Ing-loop")
 
 ## Objetivos del trabajo :
 
@@ -244,6 +244,34 @@ $$P_{k|k} = (1 - K_k) \cdot P_{k|k-1}$$
 
 
 ## Lógica de navegación reactiva implementada:
+
+El algoritmo de navegación reactiva que diseñamos se basa principalmente en estímulo-respuesta, procesando la información del entorno para modificar la velocidad diferencial de los motores de manera inmediata. Para garantizar un desplazamiento fluido, la toma de decisiones críticas (avanzar, desacelerar o girar de emergencia) se ejecuta utilizando la variable de control del Filtro de Kalman ($\hat{d}_k$), mientras que los ajustes de dirección fina se apoyan en los sensores laterales. En este diagrama de flujo creado se explica el comportamiento del algoritmo frente a los dos escenarios de pruena utilizados (para "Escenario_utilizado_simple" y "Escenario_utilizado_desafiante") :
+
+```
+
+                                  ┌──────────────────────────┐
+                                  │   Lectura de Sensores    │
+                                  └────────────┬─────────────┘
+                                               │
+                                               ▼
+                                  ┌──────────────────────────┐
+                                  │ Pipeline Filtro / Kalman │
+                                  └────────────┬─────────────┘
+                                               │
+                                               ▼
+                         ┌───────────────────────────────────────────┐
+                         │ ¿Distancia al obstáculo frontal d̂_k?      │
+                         └─────────────────────┬─────────────────────┘
+                                               │
+                 ┌─────────────────────────────┼─────────────────────────────┐
+                 │ (< 0.4m)                    │ (0.4m a 0.8m)               │ (> 0.8m)
+                 ▼                             ▼                             ▼
+   ┌───────────────────────────┐ ┌───────────────────────────┐ ┌───────────────────────────┐
+   │    GIRO DE EMERGENCIA     │ │    EVITACIÓN GRADUAL      │ │     CRUCERO MÁXIMO        │
+   │ (Giro sobre su propio eje)│ │    (Frenado y giro)       │ │   (Avance lineal libre)   │
+   └───────────────────────────┘ └───────────────────────────┘ └───────────────────────────┘
+
+```
 
 
 ## Gráfico de señales crudas, filtradas y estimadas:
