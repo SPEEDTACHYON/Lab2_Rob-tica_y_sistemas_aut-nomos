@@ -8,7 +8,7 @@ En el presente repositorio del laboratorio 2 se encuentra el readme con el segui
 
 Joaquín Rojas (Rol:Documentador,Github : "SPEEDTACHYON")
 
-Juan Rodríguez (Rol:Programador del robot, Github : " ")
+Juan Rodríguez (Rol:Programador del robot, Github : "Ing-loop")
 
 ## Objetivos del trabajo :
 
@@ -88,9 +88,9 @@ Y ahora debemos establecer las fuentes de información, es decir, en qué basarn
 
 ## Filtro simple aplicado:
 
-**Usaremos 2 filtro simple principales :** el filtro de umbral ciego (Hard thresholding) y el filtro de promedio móvil suavizado
+**Usaremos 2 filtro simple principales :** el filtro de umbral ciego (Hard Thresholding) y el filtro de promedio móvil suavizado
 
-### 1) Filtro de umbral ciego (Hard thresholding) :
+### 1) Filtro de umbral ciego (Hard Thresholding) :
 
 **Utilidad en este contexto :** Actúa como barrera de seguridad ante valores fuera de rango, como los sensores de distancia (LiDAR o ultrasónicos) son propensos a lecturas saturadas de 0.0 m o picos infinitos pérdida de eco, este algoritmo permite validar que los valores entrantes estén dentro de los límites físicos reales del hardware definidos entre 0.2 m y 4 m, cuando el sensor marca un valor fuera de este rango el filtro lo descarta de inmediato al ser físicamente imposible. 
 
@@ -205,16 +205,47 @@ $$P_{k|k-1} = P_{k-1|k-1} + Q$$
 
 **Corrección :** Rectifica los valores registrados que estén alejados del valor real, se realizará con las lecturas de los sensores frontales de distancia, los cuales entregan una medicion directa, pero ruidosa, de la cercana de obstaculos.
 
-**Ahora debemos aplicar la predicción :**
+**Ahora debemos aplicar la corrección :**
+
+### 2) La corrección de resultados :
+
+La fase de corrección ajusta la predicción teórica utilizando la observación del entorno real. 
+
+Sin embargo, para evitar que ruidos atípicos rompan el filtro, la medición física se somete a los filtrados simples que  diseñamos :
+
+**Filtro de Umbral Ciego (Hard Thresholding) :** Si la lectura del sonar/IR está fuera de $[0.2\text{ m}, 4.0\text{ m}]$, se descarta y se asume el último estado válido para evitar frenados fantasma.
+
+**Promedio móvil suavizado:** Las lecturas válidas por el Hard Tresholding entran para promediar el ruido blanco gaussiano de los motores, generando la medición corregida oficial $z_k$ para usar en las ecuaciones de Kalman.
+
+Finalmente, calculamos la ganancia de Kalman ($K_k$), la cual decide si confiar más en la predicción de los encoders o en la lectura del sonar (según los valores de $Q$ y $R$).
+
+**Ganancia de Kalman:** 
+
+$$K_k = \frac{P_{k|k-1}}{P_{k|k-1} + R}$$
+
+**Corrección del Estado:**
+
+$$\hat{d}_{k|k} = \hat{d}_{k|k-1} + K_k \cdot (z_k - \hat{d}_{k|k-1})$$Corrección de la Incertidumbre:$$P_{k|k} = (1 - K_k) \cdot P_{k|k-1}$$
 
 
 ## Lógica de navegación reactiva implementada:
+
 
 ## Gráfico de señales crudas, filtradas y estimadas:
 
 ## Resultados obtenidos en los escenarios de prueba:
 
 ## Instrucciones para ejecutar la simulación:
+
+**1)** Inicializar la aplicación de webots
+
+**2)** Empezar un nuevo entorno, y seleccionar el entrono predeterminado de e-puck.wbt.
+
+**3)** Copiar y pegar el código de programación del robot en la parte derecha de código para Webots (lenguaje de programación C) que se encuentra en el directorio "Programación_del_robot"
+
+**4)** Utilizar las lógicas de entorno e-puck.wbt tal cual, y copiar y pegar en entorno utilizado, los dos entornos utilizados en los directorios "Entrono_utilizado_simple" y "Entorno_utilizado_desafiante"
+
+**5)** Listo, entonces ahora se puede simplemente revisar el correcto funcionamiento del robot y los registros de frecuencia de muestreo y filtrados que hace recurrentemente cada segundo.
 
 
 
