@@ -213,8 +213,6 @@ $$P_{k|k-1} = P_{k-1|k-1} + Q$$
 
 **Ahora debemos aplicar la corrección :**
 
-### 2) La corrección de resultados :
-
 La fase de corrección ajusta la predicción teórica utilizando la observación del entorno real. 
 
 Sin embargo, para evitar que ruidos atípicos rompan el filtro, la medición física se somete a los filtrados simples que  diseñamos :
