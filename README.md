@@ -191,13 +191,19 @@ $$\Delta s_{der} = R_{rueda} \cdot (\theta_{der, k} - \theta_{der, k-1})$$
 
 El desplazamiento neto del centro del robot es el promedio de ambos avances: $\Delta s = \frac{\Delta s_{izq} + \Delta s_{der}}{2}$. Como el robot avanza hacia el obstáculo frontal, la distancia estimada disminuye en esa misma proporción. Recordando la aplicación del Filtro de Kalman,  las ecuaciones de predicción para el Filtro de Kalman son:
 
-**Predicción del Estado (Distancia):**
+
+**Predicción del Estado (Distancia) :**
+
 
 $$\hat{d}_{k|k-1} = \hat{d}_{k-1|k-1} - \Delta s$$
 
+
 **Predicción de la Incertidumbre:**
 
+
 $$P_{k|k-1} = P_{k-1|k-1} + Q$$
+
+
 
 ### 2) La corrección de resultados
 
@@ -219,13 +225,24 @@ Sin embargo, para evitar que ruidos atípicos rompan el filtro, la medición fí
 
 Finalmente, calculamos la ganancia de Kalman ($K_k$), la cual decide si confiar más en la predicción de los encoders o en la lectura del sonar (según los valores de $Q$ y $R$).
 
-**Ganancia de Kalman:** 
+
+**Ganancia de Kalman :** 
+
 
 $$K_k = \frac{P_{k|k-1}}{P_{k|k-1} + R}$$
 
-**Corrección del Estado:**
 
-$$\hat{d}_{k|k} = \hat{d}_{k|k-1} + K_k \cdot (z_k - \hat{d}_{k|k-1})$$Corrección de la Incertidumbre:$$P_{k|k} = (1 - K_k) \cdot P_{k|k-1}$$
+**Corrección del Estado :**
+
+
+$$\hat{d}_{k|k} = \hat{d}_{k|k-1} + K_k \cdot (z_k - \hat{d}_{k|k-1})$$
+
+
+**Corrección de la Incertidumbre :**
+
+
+$$P_{k|k} = (1 - K_k) \cdot P_{k|k-1}$$
+
 
 
 ## Lógica de navegación reactiva implementada:
