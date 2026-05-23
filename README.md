@@ -260,7 +260,7 @@ El algoritmo de navegación reactiva que diseñamos se basa principalmente en es
                                                │
                                                ▼
                          ┌───────────────────────────────────────────┐
-                         │ ¿Distancia al obstáculo frontal d̂_k?      │
+                         │   ¿Distancia al obstáculo frontal $d̂_k$?  │
                          └─────────────────────┬─────────────────────┘
                                                │
                  ┌─────────────────────────────┼─────────────────────────────┐
