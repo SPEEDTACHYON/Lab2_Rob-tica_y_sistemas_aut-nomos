@@ -1,0 +1,92 @@
+```c
+
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleLabelsFloor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/robots/gctronic/e-puck/Protos/E-puck.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/solids/protos/SolidBox.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/walls/protos/RectangleWall.proto"
+
+WorldInfo {
+  info [
+    "Laboratorio 2 - Navegación Reactiva: Entorno Desafiante"
+    "Prueba de pasillos estrechos y esquinas críticas"
+  ]
+  title "Entorno Utilizado Desafiante"
+  basicTimeStep 16
+}
+
+TexturedBackground {
+}
+
+TexturedBackgroundLight {
+}
+
+RectangleLabelsFloor {
+  size 5 5
+  tileSize 0.5 0.5
+}
+
+# Paredes del perímetro (5x5 metros)
+
+RectangleWall {
+  name "wall_perimeter"
+  size 5 5
+  height 0.4
+}
+
+# --- LABERINTO / PASILLOS INTERNOS ---
+
+# Pared Divisoria Inferior
+
+SolidBox {
+  translation -1 0.5 0.2
+  size 0.1 2.5 0.4
+  name "pared_interna_1"
+}
+
+# Pared Divisoria Superior
+
+SolidBox {
+  translation 1 -0.5 0.2
+  size 0.1 2.5 0.4
+  name "pared_interna_2"
+}
+
+# Obstáculo tipo bloque en pasillo central
+
+SolidBox {
+  translation 0 0 0.2
+  size 0.6 0.6 0.4
+  name "bloque_critico"
+}
+
+# Esquina cerrada superior izquierda
+
+SolidBox {
+  translation -1.8 1.5 0.2
+  size 1 0.1 0.4
+  name "esquina_1"
+}
+
+# Esquina cerrada inferior derecha
+
+SolidBox {
+  translation 1.8 -1.5 0.2
+  size 1 0.1 0.4
+  name "esquina_2"
+}
+
+# Instancia del robot e-puck en el cuadrante de inicio estrecho
+
+E-puck {
+  translation -2 -2 0
+  rotation 0 0 1 0.785
+  controller "mi_controlador_kalman"
+  window "<generic>"
+}
+
+
+```
