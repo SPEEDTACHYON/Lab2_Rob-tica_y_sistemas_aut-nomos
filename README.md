@@ -288,10 +288,15 @@ Como vimos, en la sección del Filtro de Kalman, este se va acercando consistent
 Finalmente, en los resultados obtenidos en los escenarios de prueba, obtuvimos que, para el escenario_utilizado_simple se evidenció el siguiente comportamiento :
 
 [0.1s] AVANZANDO | Dist. Kalman al obstaculo: 0.998 m | Sensor crudo: 1.1
+
 [3.5s] AVANZANDO | Dist. Kalman al obstaculo: 0.540 m | Sensor crudo: 0.559
+
 [6.8s] AVANZANDO | Dist. Kalman al obstaculo: 0.100 m | Sensor crudo: 0.106
+
 [7.3s] AVANZANDO | Dist. Kalman al obstaculo: 0.045 m | Sensor crudo: 0.044
+
 [7.4s] ESTADO: COLISION EVITADA! Esquivando en coord (X:0.96, Y:0.00)
+
 [8.2s] ESTADO: Camino despejado, retomando avance...
 
 **Resumen :** El robot avanza hasta que está lo suficientemente cerca del obstáculo, es detectado por los sensores a tiempo y se detiene la colisión, luego se demora un poco menos de un segundo en girar y retomar el avance ya habiendo evitado la colisión.
@@ -299,13 +304,21 @@ Finalmente, en los resultados obtenidos en los escenarios de prueba, obtuvimos q
 El principal problema suele presentarse cuando el entorno es más desafiante, y tiene múltiples obstáculos, para esto usamos múltiples obstáculos, porque si tiene múltiples obstáculos a la vez a distancia similar, puede caer en un "estado trampa", intenta evitar un obstáculo, pero al instante se encuentra con otro, si dificultábamos tanto el entorno en algunas situaciones puntuales el sensor indicaba que la colisión se evitó pero realmente el robot alcanza a impactar con el obstáculo mínimamente, ejemplo :
 
 [0.1s] AVANZANDO | Dist. Kalman al obstaculo: 0.998 m | Sensor crudo: 1.064
+
 [3.5s] AVANZANDO | Dist. Kalman al obstaculo: 0.540 m | Sensor crudo: 0.559
+
 [6.8s] AVANZANDO | Dist. Kalman al obstaculo: 0.100 m | Sensor crudo: 0.106
+
 [7.3s] AVANZANDO | Dist. Kalman al obstaculo: 0.045 m | Sensor crudo: 0.044
+
 [7.4s] ESTADO: COLISION EVITADA! Esquivando en coord (X:0.96, Y:0.22)
+
 [8.2s] ESTADO: Camino despejado, retomando avance...
+
 [8.3s] AVANZANDO | Dist. Kalman al obstaculo: 0.057 m | Sensor crudo: 0.0
+
 [8.3s] ESTADO: COLISION EVITADA! Esquivando en coord (X:0.97, Y:0.23)
+
 [9.1s] ESTADO: Camino despejado, retomando avance...
 
 En este caso, el filtrado de Kalman no le da tiempo suficiente para ajustarse al valor exacto del sensor crudo y no le da tiempo suficiente para esquivar el obstáculo en la realidad porque la distancia cruda es de 0.0 m.
