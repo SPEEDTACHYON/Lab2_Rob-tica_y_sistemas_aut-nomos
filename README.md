@@ -334,15 +334,60 @@ En este caso, el filtrado de Kalman no le da tiempo suficiente para ajustarse al
 
 ## Instrucciones para ejecutar la simulación:
 
-**1)** Inicializar la aplicación de webots
+**(1)** Inicializar la aplicación de webots
 
-**2)** Empezar un nuevo entorno, y seleccionar el entrono predeterminado de e-puck.wbt.
+**(2)** Usar el código de programación del robot para Webots (lenguaje de programación C) que se encuentra en el directorio "mi_controlador_kalman", para ello : 
 
-**3)** Copiar y pegar el código de programación del robot en la parte derecha de código para Webots (lenguaje de programación C) que se encuentra en el directorio "Programación_del_robot"
+1.En el menú superior de Webots, diríjase a Wizards > New Robot Controller...
 
-**4)** Utilizar las lógicas de entorno e-puck.wbt tal cual, y copiar y pegar en entorno utilizado, los dos entornos utilizados en los directorios "Entrono_utilizado_simple" y "Entorno_utilizado_desafiante"
+2.Seleccione el lenguaje C.
 
-**5)** Listo, entonces ahora se puede simplemente revisar el correcto funcionamiento del robot y los registros de frecuencia de muestreo y filtrados que hace recurrentemente cada segundo.
+3.Elija el compilador por defecto (normalmente GCC o Webots Makefile).
+
+4.Nombre el controlador exactamente como "mi_controlador_kalman" (este es el nombre que los mundos .wbt buscan en el nodo controller).
+
+5.Finalice el asistente. Se abrirá automáticamente un archivo .c en el editor de texto integrado de Webots (lado derecho).
+
+6. Elimine todo el código de plantilla generado por el asistente en el editor de Webots.
+
+7. Abra el archivo fuente del directorio Programación_del_robot.
+
+8. Copie íntegramente el código y péguelo en el editor de Webots.
+
+9. Paso Crítico: Haga clic en el icono del engranaje Build (Construir) en la barra superior del editor de texto. Verifique en la consola que la compilación sea exitosa (Compilation successful).
+
+
+**(3)** Utilizar las lógicas de entorno e-puck.wbt tal cual, y copiar y pegar en entorno utilizado, los dos entornos utilizados en los directorios "Entorno_utilizado_simple" y "Entorno_utilizado_desafiante"
+
+1. En el pc, ve a la carpeta principal del proyecto de Webots.
+   
+2. Dentro de esa carpeta principal, busca o crea una carpeta llamada “worlds”
+    
+3. Abre un bloc de notas o cualquier editor de texto
+   
+4. Copia todo el bloque de código de “Entorno_utilizado_simple”
+   
+5. Pégalo en el editor de texto.
+ 
+6. Ve a Archivo > Guardar como...
+ 
+7. Guardarlo dentro de la carpeta “worlds” con el nombre exacto: “Entorno_utilizado_simple.wbt.”
+ 
+8. Abre Webots.
+
+9. Ve al menú superior: File -> Open World... (Archivo -> Abrir Mundo).
+ 
+10. Navega hasta la carpeta “worlds” y selecciona el archivo “Entorno_utilizado_simple.wbt.”
+
+ El mismo procedimiento para “Entorno_utilizado_desafiante”
+
+**(4)** Ahora se puede revisar el correcto funcionamiento del robot y los registros de frecuencia de muestreo y filtrados que hace recurrentemente cada segundo : 
+
+1. Presionar reload para inciar todo desde cero y presionar el botón play
+
+2. Observe la consola de Webots. El sistema comenzará a imprimir los logs de estado de la máquina reactiva y la distancia estimada $\hat{d}_k$.
+
+3. Durante la ejecución, el código en C generará automáticamente el archivo datos_lab2_final.csv dentro de la carpeta controllers/mi_controlador_kalman/. Este archivo contiene las series de tiempo (Posición $X, Y$, Sensor Crudo y Kalman) requeridas para la generación de gráficos. Detenga la simulación antes de abrir el CSV en Excel o Python. 
 
 
 
