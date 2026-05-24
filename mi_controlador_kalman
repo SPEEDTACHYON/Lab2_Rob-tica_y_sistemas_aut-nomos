@@ -1,0 +1,223 @@
+``` c
+#include <webots/robot.h>
+#include <webots/distance_sensor.h>
+#include <webots/position_sensor.h>
+#include <webots/motor.h>
+#include <stdio.h>
+#include <math.h>
+
+// --- CONSTANTES DEL SISTEMA Y FÍSICA DEL E-PUCK ---
+#define TIME_STEP 16          // Ts en ms (62.5 Hz)
+#define R_RUEDA 0.021         // Radio de la rueda en metros (2.1 cm)
+#define DISTANCIA_RUEDAS 0.052 // "L": Distancia entre ruedas (5.2 cm)
+#define N_PROMEDIO 4          // Ventana del filtro de promedio móvil
+#define MAX_VELOCITY 6.28     // Velocidad máxima del e-puck
+#define RANGO_SENSOR 0.05     // Rango máximo físico del IR (5 cm)
+#define DISTANCIA_MAXIMA 1.414 //Máxima distancia a un obstáculo en una arena 1 m * 1 m
+#define DISTANCIA_MINIMA 0.05 //El sensor tiene una distancia minima de reconocimiento de 5 cm
+
+#define ESTADO_AVANZANDO 0
+#define ESTADO_GIRANDO 1
+
+int main(int argc, char **argv) {
+    wb_robot_init();
+
+    // 1. ARCHIVO PARA GRÁFICOS (CSV) - ¡Nombre nuevo para asegurar que es este código!
+    FILE *log_file = fopen("datos_lab2_final.csv", "w");
+    if (log_file != NULL) {
+        fprintf(log_file, "Tiempo_s,Sensor_Crudo_m,Distancia_Kalman_m,Posicion_X,Posicion_Y\n");
+    }
+
+    // 2. INICIALIZACIÓN DE SENSORES
+    WbDeviceTag ps0 = wb_robot_get_device("ps0"); 
+    WbDeviceTag ps7 = wb_robot_get_device("ps7"); 
+    WbDeviceTag ps2 = wb_robot_get_device("ps2"); 
+    WbDeviceTag ps5 = wb_robot_get_device("ps5"); 
+    wb_distance_sensor_enable(ps0, TIME_STEP);
+    wb_distance_sensor_enable(ps7, TIME_STEP);
+    wb_distance_sensor_enable(ps2, TIME_STEP);
+    wb_distance_sensor_enable(ps5, TIME_STEP);
+
+    WbDeviceTag enc_izq = wb_robot_get_device("left wheel sensor");
+    WbDeviceTag enc_der = wb_robot_get_device("right wheel sensor");
+    wb_position_sensor_enable(enc_izq, TIME_STEP);
+    wb_position_sensor_enable(enc_der, TIME_STEP);
+
+    // 3. MOTORES
+    WbDeviceTag mot_izq = wb_robot_get_device("left wheel motor");
+    WbDeviceTag mot_der = wb_robot_get_device("right wheel motor");
+    wb_motor_set_position(mot_izq, INFINITY);
+    wb_motor_set_position(mot_der, INFINITY);
+    wb_motor_set_velocity(mot_izq, 0.0);
+    wb_motor_set_velocity(mot_der, 0.0);
+
+    // --- VARIABLES GLOBALES ---
+    double pos_ant_izq = 0.0, pos_ant_der = 0.0;
+    double x_pos = 0.0, y_pos = 0.0, theta_robot = 0.0;
+    int primera_iteracion = 1;
+    double tiempo = 0.0;
+    
+    double buffer[N_PROMEDIO] = {0.0};
+    int idx = 0;
+
+    double d_tongo = 1.0;  // Distancia inicial asumida de 1 metro
+    double P = 0.5;        
+    double Q = 0.005;      
+    
+    int estado_robot = ESTADO_AVANZANDO;
+    int temporizador_giro = 0;
+    int direccion_giro = 1; 
+    int contador_impresion = 0; 
+
+    // --- BUCLE PRINCIPAL ---
+    while (wb_robot_step(TIME_STEP) != -1) {
+        tiempo += (double)TIME_STEP / 1000.0;
+
+        double pos_act_izq = wb_position_sensor_get_value(enc_izq);
+        double pos_act_der = wb_position_sensor_get_value(enc_der);
+
+        if (primera_iteracion) {
+            pos_ant_izq = pos_act_izq; 
+            pos_ant_der = pos_act_der;
+            primera_iteracion = 0;
+            continue;
+        }
+
+      
+        // ETAPA 1: PREDICCIÓN Y MOVIMIENTO 2D
+     
+        double ds_izq = R_RUEDA * (pos_act_izq - pos_ant_izq);
+        double ds_der = R_RUEDA * (pos_act_der - pos_ant_der);
+        double delta_s = (ds_izq + ds_der) / 2.0;
+        double delta_theta = (ds_der - ds_izq) / DISTANCIA_RUEDAS;
+
+        theta_robot += delta_theta;
+        x_pos += delta_s * cos(theta_robot);
+        y_pos += delta_s * sin(theta_robot);
+
+        double d_prediccion = d_tongo;
+        if (estado_robot == ESTADO_AVANZANDO) {
+            d_prediccion -= delta_s; 
+        }
+        double P_prediccion = P + Q;
+
+        pos_ant_izq = pos_act_izq; 
+        pos_ant_der = pos_act_der;
+
+       
+        // ETAPA 2: CORRECCIÓN Y FILTRADO DE UMBRAL (HARD THRESHOLDING)
+
+	// 1. La lógica para obtener distancia cruda
+
+	double raw_ps0 = wb_distance_sensor_get_value(ps0);
+double raw_ps7 = wb_distance_sensor_get_value(ps7);
+double max_cruda = (raw_ps0 > raw_ps7)? raw_ps0 : raw_ps7;
+
+// 2. Convertimos la lectura cruda a una distancia Métrica Estimada (0.0 a 1.414m)
+// Usamos el modelo físico del e-puck: valores bajos = lejos, valores altos = cerca
+
+double z_metrica = RANGO_SENSOR * (1.0 - (max_cruda / 4095.0)); 
+
+//Para evitar errores por valores negativos.
+
+if (z_metrica < 0) z_metrica=0;
+
+// 3. Aplicamos Hard Thresholding: Validamos si el dato está en el rango físico de tu arena
+
+double z_validada;
+double R;
+
+// 4. La lógica de rangos : Si está entre 0.05m y 1.414m, el dato es fisicamente posible.
+if (z_metrica >= DISTANCIA_MINIMA && z_metrica <= DISTANCIA_MAXIMA) {
+    z_validada = z_metrica;
+    R = 0.02; // El sensor está viendo algo coherente, confiamos más (R bajo)
+} else {
+    // Si está fuera de rango, es ruido o el sensor no ve nada útil
+    z_validada = d_tongo; // Mantenemos la última estimación válida (Filtro de retención)
+    R = 1000.0;           // El sensor no es fiable, confiamos solo en la predicción
+}
+
+
+       //5. Filtrado del promedio móvil suavizado
+
+        buffer[idx] = z_cruda;
+        idx = (idx + 1) % N_PROMEDIO;
+        double z_k = (buffer[0] + buffer[1] + buffer[2] + buffer[3]) / 4.0;
+
+       
+        // ETAPA 3: ACTUALIZACIÓN DE KALMAN
+    
+        double K = P_prediccion / (P_prediccion + R);
+        d_tongo = d_prediccion + K * (z_k - d_prediccion);
+        P = (1.0 - K) * P_prediccion;
+
+        if (log_file != NULL && estado_robot == ESTADO_AVANZANDO) {
+            fprintf(log_file, "%.3f,%.4f,%.4f,%.4f,%.4f\n", 
+                    tiempo, z_cruda, d_tongo, x_pos, y_pos);
+            fflush(log_file); // GUARDA EN DISCO INMEDIATAMENTE
+        }
+
+
+        // ETAPA 4: NAVEGACIÓN REACTIVA OBLICUA Y LOGS
+
+        double v_izq = 0.0, v_der = 0.0;
+
+        if (estado_robot == ESTADO_AVANZANDO) {
+            if (d_tongo < 0.04 || max_cruda > 150.0) {
+                
+                double lat_izq = wb_distance_sensor_get_value(ps5);
+                double lat_der = wb_distance_sensor_get_value(ps2);
+                direccion_giro = (lat_izq > lat_der) ? 1 : -1;  
+
+                estado_robot = ESTADO_GIRANDO;
+                
+                // GIRO OBLICUO GARANTIZADO: 28 iteraciones = ~135 grados.
+                // Rebota en diagonal hacia el centro de la arena sin importar donde choque.
+                temporizador_giro = 28; 
+                
+                printf("[%.1fs] ESTADO: COLISION EVITADA! Esquivando en coord (X:%.2f, Y:%.2f)\n", 
+                       tiempo, x_pos, y_pos);
+                fflush(stdout); // FORZA LA IMPRESION EN CONSOLA
+                
+                contador_impresion = 0; 
+            } else {
+                v_izq = MAX_VELOCITY;
+                v_der = MAX_VELOCITY;
+                
+                if (contador_impresion == 0) {
+                    printf("[%.1fs] AVANZANDO | Kalman: %.3f m | Sensor: %d\n", 
+                           tiempo, d_tongo, (int)max_cruda);
+                    fflush(stdout); // FORZA LA IMPRESION EN CONSOLA
+                }
+                
+                contador_impresion++;
+                if (contador_impresion >= 30) contador_impresion = 0;
+            }
+        } 
+        else if (estado_robot == ESTADO_GIRANDO) {
+            v_izq = MAX_VELOCITY * direccion_giro;
+            v_der = -MAX_VELOCITY * direccion_giro;
+            
+            temporizador_giro--;
+            
+            // Fin del giro oblicuo ciego (ignora sensores mientras gira para no "bugearse")
+            if (temporizador_giro <= 0) { 
+                estado_robot = ESTADO_AVANZANDO;
+                d_tongo = 1.0; 
+                P = 0.5;
+                printf("[%.1fs] ESTADO: Camino oblicuo despejado, retomando avance...\n", tiempo);
+                fflush(stdout); // Para forzar que imprima en consola
+                contador_impresion = 0; 
+            }
+        }
+
+        wb_motor_set_velocity(mot_izq, v_izq);
+        wb_motor_set_velocity(mot_der, v_der);
+    } 
+
+    if (log_file != NULL) fclose(log_file);
+    wb_robot_cleanup();
+    return 0;
+}
+
+```
