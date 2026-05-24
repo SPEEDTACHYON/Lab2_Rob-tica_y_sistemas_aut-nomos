@@ -1,4 +1,5 @@
-``` c
+//Librerias
+
 #include <webots/robot.h>
 #include <webots/distance_sensor.h>
 #include <webots/position_sensor.h>
@@ -6,7 +7,8 @@
 #include <stdio.h>
 #include <math.h>
 
-// --- CONSTANTES DEL SISTEMA Y FÍSICA DEL E-PUCK ---
+// Constantes
+
 #define TIME_STEP 16          // Ts en ms (62.5 Hz)
 #define R_RUEDA 0.021         // Radio de la rueda en metros (2.1 cm)
 #define DISTANCIA_RUEDAS 0.052 // "L": Distancia entre ruedas (5.2 cm)
@@ -15,9 +17,10 @@
 #define RANGO_SENSOR 0.05     // Rango máximo físico del IR (5 cm)
 #define DISTANCIA_MAXIMA 1.414 //Máxima distancia a un obstáculo en una arena 1 m * 1 m
 #define DISTANCIA_MINIMA 0.05 //El sensor tiene una distancia minima de reconocimiento de 5 cm
-
 #define ESTADO_AVANZANDO 0
 #define ESTADO_GIRANDO 1
+
+//Inicio del main
 
 int main(int argc, char **argv) {
     wb_robot_init();
@@ -107,35 +110,35 @@ int main(int argc, char **argv) {
        
         // ETAPA 2: CORRECCIÓN Y FILTRADO DE UMBRAL (HARD THRESHOLDING)
 
-	// 1. La lógica para obtener distancia cruda
+		// 1. La lógica para obtener distancia cruda
 
-	double raw_ps0 = wb_distance_sensor_get_value(ps0);
-double raw_ps7 = wb_distance_sensor_get_value(ps7);
-double max_cruda = (raw_ps0 > raw_ps7)? raw_ps0 : raw_ps7;
+		double raw_ps0 = wb_distance_sensor_get_value(ps0);
+		double raw_ps7 = wb_distance_sensor_get_value(ps7);
+		double max_cruda = (raw_ps0 > raw_ps7)? raw_ps0 : raw_ps7;
+		
+		// 2. Convertimos la lectura cruda a una distancia Métrica Estimada (0.0 a 1.414m)
+		// Usamos el modelo físico del e-puck: valores bajos = lejos, valores altos = cerca
+		
+		double z_metrica = RANGO_SENSOR * (1.0 - (max_cruda / 4095.0)); 
+		
+		//Para evitar errores por valores negativos.
+		
+		if (z_metrica < 0) z_metrica=0;
+		
+		// 3. Aplicamos Hard Thresholding: Validamos si el dato está en el rango físico de tu arena
+		
+		double z_validada;
+		double R;
 
-// 2. Convertimos la lectura cruda a una distancia Métrica Estimada (0.0 a 1.414m)
-// Usamos el modelo físico del e-puck: valores bajos = lejos, valores altos = cerca
-
-double z_metrica = RANGO_SENSOR * (1.0 - (max_cruda / 4095.0)); 
-
-//Para evitar errores por valores negativos.
-
-if (z_metrica < 0) z_metrica=0;
-
-// 3. Aplicamos Hard Thresholding: Validamos si el dato está en el rango físico de tu arena
-
-double z_validada;
-double R;
-
-// 4. La lógica de rangos : Si está entre 0.05m y 1.414m, el dato es fisicamente posible.
-if (z_metrica >= DISTANCIA_MINIMA && z_metrica <= DISTANCIA_MAXIMA) {
-    z_validada = z_metrica;
-    R = 0.02; // El sensor está viendo algo coherente, confiamos más (R bajo)
-} else {
-    // Si está fuera de rango, es ruido o el sensor no ve nada útil
-    z_validada = d_tongo; // Mantenemos la última estimación válida (Filtro de retención)
-    R = 1000.0;           // El sensor no es fiable, confiamos solo en la predicción
-}
+		// 4. La lógica de rangos : Si está entre 0.05m y 1.414m, el dato es fisicamente posible.
+		if (z_metrica >= DISTANCIA_MINIMA && z_metrica <= DISTANCIA_MAXIMA) {
+		    z_validada = z_metrica;
+		    R = 0.02; // El sensor está viendo algo coherente, confiamos más (R bajo)
+		} else {
+		    // Si está fuera de rango, es ruido o el sensor no ve nada útil
+		    z_validada = d_tongo; // Mantenemos la última estimación válida (Filtro de retención)
+		    R = 1000.0;           // El sensor no es fiable, confiamos solo en la predicción
+		}
 
 
        //5. Filtrado del promedio móvil suavizado
@@ -220,4 +223,3 @@ if (z_metrica >= DISTANCIA_MINIMA && z_metrica <= DISTANCIA_MAXIMA) {
     return 0;
 }
 
-```
