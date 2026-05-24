@@ -1,0 +1,62 @@
+```c
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleLabelsFloor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/robots/gctronic/e-puck/Protos/E-puck.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/solids/protos/SolidCylinder.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/walls/protos/RectangleWall.proto"
+
+WorldInfo {
+  info [
+    "Laboratorio 2 - Navegación Reactiva: Entorno Simple"
+    "Filtro de Kalman y Fusión de Sensores"
+  ]
+  title "Entorno Utilizado Simple"
+  basicTimeStep 16
+}
+
+TexturedBackground {
+}
+
+TexturedBackgroundLight {
+}
+
+RectangleLabelsFloor {
+  size 5 5
+  tileSize 0.5 0.5
+}
+
+# Paredes del recinto principal (5x5 metros)
+RectangleWall {
+  name "wall_perimeter"
+  size 5 5
+  height 0.3
+}
+
+# Obstáculo 1: Caja Central Izquierda
+SolidBox {
+  translation -0.8 0.5 0.15
+  height 0.3
+  radius 0.25
+  name "obstaculo_1"
+}
+
+# Obstáculo 2: Caja Central Derecha
+SolidBox {
+  translation 0.8 -0.5 0.15
+  height 0.3
+  radius 0.25
+  name "obstaculo_2"
+}
+
+# Instancia del robot e-puck cargando el controlador
+E-puck {
+  translation 0 -1.8 0
+  rotation 0 0 1 1.57
+  controller "mi_controlador_kalman"
+  window "<generic>"
+}
+
+```
