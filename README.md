@@ -25,7 +25,7 @@ Nuestro objetivo como grupo es asignarnos roles y dividirnos el trabajo correcta
 
 ## Descripción del robot y sensores utilizados:
 
-Nuestro robot será un robot móvil diferencial con una locomoción por ruedas el cual fue estpeticamente hecho en e-puck.wbt en Webots, los sensores que utilizaremos en el robot serán : 
+Nuestro robot será un robot móvil diferencial con una locomoción por ruedas el cual fue estéticamente hecho en e-puck.wbt en Webots, los sensores que utilizaremos en el robot serán : 
 
 ### 1. Sensores de distancia y proximidad :
 
@@ -35,7 +35,7 @@ Para  los sensores frontales de distancia, y los sensores laterales.
 
 **(b) sensores de ultrasonido (Sonar o UltrasonicSensors) :**
 
-Para usarlos configurar DistanceSensors configurados como tipo "sonar", Por qué? Porque dan mayor rango de apertura y de distancia que los infrarrojos
+Para usarlos configurar DistanceSensors configurados como tipo "sonar", ¿Por qué? Porque dan mayor rango de apertura y de distancia que los infrarrojos
 
 ### 2. Encoders de rueda : Sensores de posición angular (PositionSensors)
 
@@ -209,7 +209,7 @@ $$P_{k|k-1} = P_{k-1|k-1} + Q$$
 
 **Primero , recordemos qué debíamos hacer en la corrección :**
 
-**Corrección :** Rectifica los valores registrados que estén alejados del valor real, se realizará con las lecturas de los sensores frontales de distancia, los cuales entregan una medicion directa, pero ruidosa, de la cercana de obstaculos.
+**Corrección :** Rectifica los valores registrados que estén alejados del valor real, se realizará con las lecturas de los sensores frontales de distancia, los cuales entregan una medicion directa, pero ruidosa, de la cercana de obstáculos.
 
 **Ahora debemos aplicar la corrección :**
 
@@ -280,7 +280,7 @@ El algoritmo de navegación reactiva que diseñamos se basa principalmente en es
 
 **Explicación del gráfico :**
 
-Como vimos, en la sección del filtrado de Kalman, el filtro de Kalmaqn se va acercando consistentemente al valor real a lo largo del tiempo hasta tener un error prácticamente nulo al ajustarse a los datos reales, mientras el filtro promedio demora un poco más en ajustarse a la medición cruda, la medición cruda se mantiene prácticamente completamente consistente en un valor, solamente constando de micro-variaciones por ruido mínimo en el sensor.
+Como vimos, en la sección del Filtro de Kalman, este se va acercando consistentemente al valor real a lo largo del tiempo hasta tener un error prácticamente nulo al ajustarse a los datos reales, mientras el filtro promedio demora un poco más en ajustarse a la medición cruda y su resultado puede desviarse un poco del valor crudo a lo largo del tiempo a diferencia del Filtro de Kalman que se mantiene mucho más consistente y más cercano al valor real cada vez, la medición cruda se mantiene prácticamente completamente consistente en un valor, sólamente constando de micro-variaciones por ruido mínimo en el sensor.
 
 
 ## Resultados obtenidos en los escenarios de prueba:
@@ -296,7 +296,7 @@ Finalmente, en los resultados obtenidos en los escenarios de prueba, obtuvimos q
 
 **Resumen :** El robot avanza hasta que está lo suficientemente cerca del obstáculo, es detectado por los sensores a tiempo y se detiene la colisión, luego se demora un poco menos de un segundo en girar y retomar el avance ya habiendo evitado la colisión.
 
-El principal problema suele presentarse cuando el entorno es más desafiante, y tiene múltiples obstáculos, para esto usamos múltiples obstáculos, porque si tiene múltiples obstáculos a la vez a distancia similar, puede caer en un "estado trampa", intenta evitar un obstáculo, pero al instante se encuentra con otro, si dificultabamos tanto el entorno en algunas situaciones puntuales el sensor indicaba que la colisión se evitó pero realmente el robot alcanza a impactar con el obstáculo minimamente, ejemplo :
+El principal problema suele presentarse cuando el entorno es más desafiante, y tiene múltiples obstáculos, para esto usamos múltiples obstáculos, porque si tiene múltiples obstáculos a la vez a distancia similar, puede caer en un "estado trampa", intenta evitar un obstáculo, pero al instante se encuentra con otro, si dificultábamos tanto el entorno en algunas situaciones puntuales el sensor indicaba que la colisión se evitó pero realmente el robot alcanza a impactar con el obstáculo mínimamente, ejemplo :
 
 [0.1s] AVANZANDO | Dist. Kalman al obstaculo: 0.998 m | Sensor crudo: 1.064
 [3.5s] AVANZANDO | Dist. Kalman al obstaculo: 0.540 m | Sensor crudo: 0.559
@@ -330,8 +330,6 @@ En este caso, el filtrado de Kalman no le da tiempo suficiente para ajustarse al
 **4)** Utilizar las lógicas de entorno e-puck.wbt tal cual, y copiar y pegar en entorno utilizado, los dos entornos utilizados en los directorios "Entrono_utilizado_simple" y "Entorno_utilizado_desafiante"
 
 **5)** Listo, entonces ahora se puede simplemente revisar el correcto funcionamiento del robot y los registros de frecuencia de muestreo y filtrados que hace recurrentemente cada segundo.
-
-**6)** Si surge un error en la simulación, háganos saber.
 
 
 
