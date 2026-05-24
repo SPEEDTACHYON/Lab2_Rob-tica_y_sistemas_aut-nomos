@@ -92,7 +92,7 @@ Y ahora debemos establecer las fuentes de información, es decir, en qué basarn
 
 ### 1) Filtro de umbral ciego (Hard Thresholding) :
 
-**Utilidad en este contexto :** Actúa como barrera de seguridad ante valores fuera de rango, como los sensores de distancia (LiDAR o ultrasónicos) son propensos a lecturas saturadas de 0.0 m o picos infinitos pérdida de eco, este algoritmo permite validar que los valores entrantes estén dentro de los límites físicos reales del hardware definidos entre 0.2 m y 4 m, cuando el sensor marca un valor fuera de este rango el filtro lo descarta de inmediato al ser físicamente imposible. 
+**Utilidad en este contexto :** Actúa como barrera de seguridad ante valores fuera de rango, como los sensores de distancia (LiDAR o ultrasónicos) son propensos a lecturas saturadas de 0.0 m o picos infinitos pérdida de eco, este algoritmo permite validar que los valores entrantes estén dentro de los límites físicos reales del hardware definidos entre 0.05 m y 1.414 m (fuera de 1.414 es una distancia del obstáculo fuera del tamaño máximo posible en una arena de tamaño 1 m *1 m) , cuando el sensor marca un valor fuera de este rango el filtro lo descarta de inmediato al ser físicamente imposible. 
 
 **Impacto de control en el Filtro de Kalman :** Bloquea valores extremos directos, elimina el riesgo de que el Filtro de Kalman experimente saltos abruptos, lo que previene de forma absoluta la ejecución de frenados fantasma o las maniobras de evasión erróneas que pueden ser provocadas por la saturación de ruido acumulado.
 
@@ -276,7 +276,48 @@ El algoritmo de navegación reactiva que diseñamos se basa principalmente en es
 
 ## Gráfico de señales crudas, filtradas y estimadas:
 
+<img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/b8ba6146-20a4-43ad-b280-64023fb20661" />
+
+**Explicación del gráfico :**
+
+Como vimos, en la sección del filtrado de Kalman, el filtro de Kalmaqn se va acercando consistentemente al valor real a lo largo del tiempo hasta tener un error prácticamente nulo al ajustarse a los datos reales, mientras el filtro promedio demora un poco más en ajustarse a la medición cruda, la medición cruda se mantiene prácticamente completamente consistente en un valor, solamente constando de micro-variaciones por ruido mínimo en el sensor.
+
+
 ## Resultados obtenidos en los escenarios de prueba:
+
+Finalmente, en los resultados obtenidos en los escenarios de prueba, obtuvimos que, para el escenario_utilizado_simple se evidenció el siguiente comportamiento :
+
+[0.1s] AVANZANDO | Dist. Kalman al obstaculo: 0.998 m | Sensor crudo: 1.1
+[3.5s] AVANZANDO | Dist. Kalman al obstaculo: 0.540 m | Sensor crudo: 0.559
+[6.8s] AVANZANDO | Dist. Kalman al obstaculo: 0.100 m | Sensor crudo: 0.106
+[7.3s] AVANZANDO | Dist. Kalman al obstaculo: 0.045 m | Sensor crudo: 0.044
+[7.4s] ESTADO: COLISION EVITADA! Esquivando en coord (X:0.96, Y:0.00)
+[8.2s] ESTADO: Camino despejado, retomando avance...
+
+**Resumen :** El robot avanza hasta que está lo suficientemente cerca del obstáculo, es detectado por los sensores a tiempo y se detiene la colisión, luego se demora un poco menos de un segundo en girar y retomar el avance ya habiendo evitado la colisión.
+
+El principal problema suele presentarse cuando el entorno es más desafiante, y tiene múltiples obstáculos, para esto usamos múltiples obstáculos, porque si tiene múltiples obstáculos a la vez a distancia similar, puede caer en un "estado trampa", intenta evitar un obstáculo, pero al instante se encuentra con otro, si dificultabamos tanto el entorno en algunas situaciones puntuales el sensor indicaba que la colisión se evitó pero realmente el robot alcanza a impactar con el obstáculo minimamente, ejemplo :
+
+[0.1s] AVANZANDO | Dist. Kalman al obstaculo: 0.998 m | Sensor crudo: 1.064
+[3.5s] AVANZANDO | Dist. Kalman al obstaculo: 0.540 m | Sensor crudo: 0.559
+[6.8s] AVANZANDO | Dist. Kalman al obstaculo: 0.100 m | Sensor crudo: 0.106
+[7.3s] AVANZANDO | Dist. Kalman al obstaculo: 0.045 m | Sensor crudo: 0.044
+[7.4s] ESTADO: COLISION EVITADA! Esquivando en coord (X:0.96, Y:0.22)
+[8.2s] ESTADO: Camino despejado, retomando avance...
+[8.3s] AVANZANDO | Dist. Kalman al obstaculo: 0.057 m | Sensor crudo: 0.0
+[8.3s] ESTADO: COLISION EVITADA! Esquivando en coord (X:0.97, Y:0.23)
+[9.1s] ESTADO: Camino despejado, retomando avance...
+
+En este caso, el filtrado de Kalman no le da tiempo suficiente para ajustarse al valor exacto del sensor crudo y no le da tiempo suficiente para esquivar el obstáculo en la realidad porque la distancia cruda es de 0.0 m.
+
+## Conclusiones analíticas
+
+**1)** El filtrado de Kalman es un filtro que se aproxima al valor crudo correctamente a lo largo del tiempo, funciona bien para variables de control que no cambian abruptamente, sin embargo, en el caso de la distancia frontal a un obstáculo si hay saturación de obstáculos el filtro de Kalman puede ser insuficiente en algunas ocasiones.
+
+**2)** Antes de utilizar el filtro de Kalman es esencial implementar filtros simples anteriores que comprueben que las distancias son realistas, como es el caso del filtrado simple Hard Thresholding, nos permite establecer rangos sin que salgan fuera de la realidad física del entorno.
+
+**3)** Al implementar escenarios con obstáculos complejos en Webots, aprendimos que la complejidad del escenario afecta considerablemente en la precisión y certidumbre del robot, mientras más obstáculos tiene el entorno, las opciones de error del robot se disparan, la cantidad de rutas posibles se reduce considerablemente y el movimiento fluído en el entorno es cada vez más restringido.
+
 
 ## Instrucciones para ejecutar la simulación:
 
@@ -289,6 +330,8 @@ El algoritmo de navegación reactiva que diseñamos se basa principalmente en es
 **4)** Utilizar las lógicas de entorno e-puck.wbt tal cual, y copiar y pegar en entorno utilizado, los dos entornos utilizados en los directorios "Entrono_utilizado_simple" y "Entorno_utilizado_desafiante"
 
 **5)** Listo, entonces ahora se puede simplemente revisar el correcto funcionamiento del robot y los registros de frecuencia de muestreo y filtrados que hace recurrentemente cada segundo.
+
+**6)** Si surge un error en la simulación, háganos saber.
 
 
 
