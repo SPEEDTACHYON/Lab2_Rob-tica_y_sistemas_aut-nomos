@@ -151,7 +151,7 @@ En la primera iteración se recibe una lectura del sensor de posición: $z_1 = 2
   $$K_1 = \frac{P_{1,\text{pred}}}{P_{1,\text{pred}} + R} = \frac{1.1}{1.1 + 0.8} = \frac{1.1}{1.9} \approx 0.579$$
   
 **Actualización del Estado:**
-  $$\hat{x}_1 = \hat{x}_{1,\text{pred}} + K_1 \cdot (z_1 - \hat{x}_{1,\text{pred}}) = 26 + 0.579 \cdot (25.4 - 26) = 25.65 \text{ m}$$
+  x̂₁ = x̂₁pred + K₁ (ẑ₁ - x̂₁pred) = 26 + 0.579 (25.4 - 26) = 25.65 (es incompatible en markdown)
   
 **Actualización de la Covarianza:**
   $$P_1 = (1 - K_1) \cdot P_{1,\text{pred}} = (1 - 0.579) \cdot 1.1 = 0.4631$$
@@ -179,7 +179,7 @@ En la segunda iteración se recibe una nueva lectura del sensor de posición: $z
   $$K_2 = \frac{P_{2,\text{pred}}}{P_{2,\text{pred}} + R} = \frac{0.6631}{0.6631 + 0.8} = \frac{0.6631}{1.4631} \approx 0.4532$$
   
 **Actualización del Estado:**
-  $$\hat{x}_2 = \hat{x}_{2,\text{pred}} + K_2 \cdot (z_2 - \hat{x}_{2,\text{pred}}) = 26.65 + 0.4532 \cdot (26.4 - 26.65) = 26.5367 \text{ m}$$
+ x̂₂ = x̂₂pred + K₁ (ẑ₂ - x̂₂pred) = 26.65 + 0.4532 (26.4 - 26.65) = 26.5367 (es incompatible en Markdown)
   
 **Actualización de la Covarianza:**
   $$P_2 = (1 - K_2) \cdot P_{2,\text{pred}} = (1 - 0.4532) \cdot 0.6631 = 0.3630$$
