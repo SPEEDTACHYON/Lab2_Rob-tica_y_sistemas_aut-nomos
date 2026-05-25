@@ -27,6 +27,8 @@
 int main(int argc, char **argv) {
     wb_robot_init();
 
+	// Generar archivo csv con los valores crudos, filtrados y estimados
+
     FILE *log_file = fopen("datos_lab2_final.csv", "w");
     if (log_file != NULL) {
         fprintf(log_file, "Tiempo_s,Sensor_Crudo_m,Distancia_Kalman_m,Posicion_X,Posicion_Y\n");
