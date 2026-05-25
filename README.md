@@ -138,45 +138,55 @@ El filtro de Kalman funciona por iteraciones (t) , y en cada iteración, el filt
 En la primera iteración se recibe una lectura del sensor de posición: $z_1 = 25.4$ m
 
 ##### 1.1. Etapa de Predicción
-* **Predicción del Estado:**
+
+**Predicción del Estado:**
   $$\hat{x}_{1,\text{pred}} = \hat{x}_0 + u \cdot \Delta t = 25 + (1 \cdot 1) = 26 \text{ m}$$
-* **Predicción de la Covarianza:**
+  
+**Predicción de la Covarianza:**
   $$P_{1,\text{pred}} = P_0 + Q = 0.9 + 0.2 = 1.1$$
 
 ##### 1.2. Etapa de Corrección (Actualización)
-* **Ganancia de Kalman ($K_1$):**
+
+**Ganancia de Kalman ($K_1$):**
   $$K_1 = \frac{P_{1,\text{pred}}}{P_{1,\text{pred}} + R} = \frac{1.1}{1.1 + 0.8} = \frac{1.1}{1.9} \approx 0.579$$
-* **Actualización del Estado:**
-  \hat{x}_1 = \hat{x}_{1,\text{pred}} + K_1 \cdot (z_1 - \hat{x}_{1,\text{pred}}) = 26 + 0.579 \cdot (25.4 - 26) = 25.65 \text{ m}
-* **Actualización de la Covarianza:**
+  
+**Actualización del Estado:**
+  $$\hat{x}_1 = \hat{x}_{1,\text{pred}} + K_1 \cdot (z_1 - \hat{x}_{1,\text{pred}}) = 26 + 0.579 \cdot (25.4 - 26) = 25.65 \text{ m}$$
+  
+**Actualización de la Covarianza:**
   $$P_1 = (1 - K_1) \cdot P_{1,\text{pred}} = (1 - 0.579) \cdot 1.1 = 0.4631$$
 
 ##### 1.3. Evaluación del Error
-* **Error porcentual de $\hat{x}_1$ con respecto a $z_1$:**
-  $$\text{Error } (\%) = \left(\frac{\hat{x}_1}{z_1}\right) \cdot 100\% - 100\% = 0.9\%$$
 
----
+**Error porcentual de $\hat{x}_1$ con respecto a $z_1$:**
+  $$\text{Error } (\%) = \left(\frac{\hat{x}_1}{z_1}\right) \cdot 100\% - 100\% = 0.9\%$$
 
 #### Iteración 2 ($t = 2$)
 
 En la segunda iteración se recibe una nueva lectura del sensor de posición: $z_2 = 26.4$ m
 
 ##### 2.1. Etapa de Predicción
-* **Predicción del Estado:**
+
+**Predicción del Estado:**
   $$\hat{x}_{2,\text{pred}} = \hat{x}_1 + u \cdot \Delta t = 25.65 + (1 \cdot 1) = 26.65 \text{ m}$$
-* **Predicción de la Covarianza:**
+  
+**Predicción de la Covarianza:**
   $$P_{2,\text{pred}} = P_1 + Q = 0.4631 + 0.2 = 0.6631$$
 
 ##### 2.2. Etapa de Corrección (Actualización)
-* **Ganancia de Kalman ($K_2$):**
+
+**Ganancia de Kalman ($K_2$):**
   $$K_2 = \frac{P_{2,\text{pred}}}{P_{2,\text{pred}} + R} = \frac{0.6631}{0.6631 + 0.8} = \frac{0.6631}{1.4631} \approx 0.4532$$
-* **Actualización del Estado:**
-  \hat{x}_2 = \hat{x}_{2,\text{pred}} + K_2 \cdot (z_2 - \hat{x}_{2,\text{pred}}) = 26.65 + 0.4532 \cdot (26.4 - 26.65) = 26.5367 \text{ m}
-* **Actualización de la Covarianza:**
+  
+**Actualización del Estado:**
+  $$\hat{x}_2 = \hat{x}_{2,\text{pred}} + K_2 \cdot (z_2 - \hat{x}_{2,\text{pred}}) = 26.65 + 0.4532 \cdot (26.4 - 26.65) = 26.5367 \text{ m}$$
+  
+**Actualización de la Covarianza:**
   $$P_2 = (1 - K_2) \cdot P_{2,\text{pred}} = (1 - 0.4532) \cdot 0.6631 = 0.3630$$
 
 ##### 2.3. Evaluación del Error
-* **Error porcentual de $\hat{x}_2$ con respecto a $z_2$:**
+
+**Error porcentual de $\hat{x}_2$ con respecto a $z_2$:**
   $$\text{Error } (\%) = \left(\frac{\hat{x}_2}{z_2}\right) \cdot 100\% - 100\% = 0.518\%$$
 
 **Análisis :** el error porcentual de $\hat{x}$ con respecto a z siempre irá bajando por cada iteración, hasta (t=k)
