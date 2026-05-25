@@ -121,53 +121,66 @@ El filtro de Kalman funciona por iteraciones (t) , y en cada iteración, el filt
 
 <img width="623" height="396" alt="image" src="https://github.com/user-attachments/assets/cb0c7510-d4d5-4985-ba79-4563eb599c17" />
 
-### Ejemplo físico aplicado del filtro de Kalman :
+### Ejemplo Físico Aplicado del Filtro de Kalman
 
-x̂₀ = 25 m
+#### Parámetros Iniciales ($t = 0$)
 
-P₀ = 0.9 (confiamos lo justo en nuestra posición inicial)
+* **Estimación del estado inicial:** $\hat{x}_0 = 25$ m
+* **Incertidumbre inicial (Covarianza del error):** $P_0 = 0.9$ *(confiamos lo justo en nuestra posición inicial)*
+* **Variable de control (Rapidez):** $u = 1$ m/s en un intervalo de tiempo $\Delta t = 1$ s
+* **Ruido del proceso (Incertidumbre del modelo):** $Q = 0.2$ *(proceso medianamente estable)*
+* **Ruido de la medición (Incertidumbre del sensor):** $R = 0.8$ *(sensor considerablemente errado)*
 
-u = 1 m/s en un ∆t=1 (en este caso la variable de control es la rapidez)
+---
 
-Q = 0.2 (medianamente estable)
+#### Iteración 1 ($t = 1$)
 
-R = 0.8 (considerablemente errado)
+En la primera iteración se recibe una lectura del sensor de posición: $z_1 = 25.4$ m
 
-(t=1)
+##### 1.1. Etapa de Predicción
+* **Predicción del Estado:**
+  $$\hat{x}_{1,\text{pred}} = \hat{x}_0 + u \cdot \Delta t = 25 + (1 \cdot 1) = 26 \text{ m}$$
+* **Predicción de la Covarianza:**
+  $$P_{1,\text{pred}} = P_0 + Q = 0.9 + 0.2 = 1.1$$
 
-en la primera iteración se nos entrega un valor de posición z₁ = 25.4 m
+##### 1.2. Etapa de Corrección (Actualización)
+* **Ganancia de Kalman ($K_1$):**
+  $$K_1 = \frac{P_{1,\text{pred}}}{P_{1,\text{pred}} + R} = \frac{1.1}{1.1 + 0.8} = \frac{1.1}{1.9} \approx 0.579$$
+* **Actualización del Estado:**
+  $$\hat{x}_1 = \hat{x}_{1,\text{pred}} + K_1 \cdot (z_1 - \hat{x}_{1,\text{pred}}) = 26 + 0.579 \cdot (25.4 - 26) = 25.65 \text{ m}$$
+* **Actualización de la Covarianza:**
+  $$P_1 = (1 - K_1) \cdot P_{1,\text{pred}} = (1 - 0.579) \cdot 1.1 = 0.4631$$
 
-x̂₁pred = x̂₀ + u * ∆t = 25 + 1*1 = 26 m
+##### 1.3. Evaluación del Error
+* **Error porcentual de $\hat{x}_1$ con respecto a $z_1$:**
+  $$\text{Error } (\%) = \left(\frac{\hat{x}_1}{z_1}\right) \cdot 100\% - 100\% = 0.9\%$$
 
-P₁pred = P₀+ Q = 0.9 + 0.2 = 1.1
+---
 
-K₁= P₁pred / (P₁pred + R) = 1.1 / 1.9 = 0.579
+#### Iteración 2 ($t = 2$)
 
-x̂₁ = x̂₁pred + K₁ (ẑ₁ - x̂₁pred) = 26 + 0.579 (25.4 - 26) = 25.65
+En la segunda iteración se recibe una nueva lectura del sensor de posición: $z_2 = 26.4$ m
 
-P₁ = (1 - K₁) * P₁pred = (1 - 0.579) * 1.1  = 0.4631
+##### 2.1. Etapa de Predicción
+* **Predicción del Estado:**
+  $$\hat{x}_{2,\text{pred}} = \hat{x}_1 + u \cdot \Delta t = 25.65 + (1 \cdot 1) = 26.65 \text{ m}$$
+* **Predicción de la Covarianza:**
+  $$P_{2,\text{pred}} = P_1 + Q = 0.4631 + 0.2 = 0.6631$$
 
-error porcentual de x̂₁ con respecto a z₁ = (x̂₁/z₁)*100% - 100% = 0.9 %
+##### 2.2. Etapa de Corrección (Actualización)
+* **Ganancia de Kalman ($K_2$):**
+  $$K_2 = \frac{P_{2,\text{pred}}}{P_{2,\text{pred}} + R} = \frac{0.6631}{0.6631 + 0.8} = \frac{0.6631}{1.4631} \approx 0.4532$$
+* **Actualización del Estado:**
+  $$\hat{x}_2 = \hat{x}_{2,\text{pred}} + K_2 \cdot (z_2 - \hat{x}_{2,\text{pred}}) = 26.65 + 0.4532 \cdot (26.4 - 26.65) = 26.5367 \text{ m}$$
+* **Actualización de la Covarianza:**
+  $$P_2 = (1 - K_2) \cdot P_{2,\text{pred}} = (1 - 0.4532) \cdot 0.6631 = 0.3630$$
 
-(t=2)
+##### 2.3. Evaluación del Error
+* **Error porcentual de $\hat{x}_2$ con respecto a $z_2$:**
+  $$\text{Error } (\%) = \left(\frac{\hat{x}_2}{z_2}\right) \cdot 100\% - 100\% = 0.518\%$$
 
-en la segunda iteración se nos entrega un valor de posición z₂ = 26.4 m
+**Análisis :** el error porcentual de $\hat{x}$ con respecto a z siempre irá bajando por cada iteración, hasta (t=k)
 
-x̂₂pred = x̂₁ + u * ∆t = 25.65 + 1*1 = 26.65 m
-
-P₂pred = P₁+ Q = 0.4631 + 0.2 = 0.6631
-
-K₂= P₂pred / (P₂pred + R) = 0.6631 / 1.4631 = 0.4532
-
-x̂₂ = x̂₂pred + K₁ (ẑ₂ - x̂₂pred) = 26.65 + 0.4532 (26.4 - 26.65) = 26.5367
-
-P₂ = (1 - K₂) * P₂pred = (1 - 0.4532) * 0.6631  = 0.363
-
-error porcentual de x̂₂ con respecto a z₂ = (x̂₂/z₂)*100% - 100% = 0.518 %
-
-el error porcentual de x̂ con respecto a z siempre irá bajando por cada iteración.
-
-hasta (t=k)
 
 Para el caso de estudio, se debe aplicar el filtro de Kalman en k iteraciones como en el ejemplo, solo hay algo importante, en nuestro caso de estudio la variable de control es la distancia frontal al obstáculo más cercano, por tanto su notación no es $\hat{x}_k$ sino $\hat{d}_k$
 
